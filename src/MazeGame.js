@@ -7,12 +7,9 @@ import './ControlPanel.css';
 const WIDTH = 500;
 const HEIGHT = 700;
 const GRID_SIZE = Math.min(WIDTH, HEIGHT - 100) / 7; // 7 original
-//const ROWS = 7;
-//const COLS = 7;
 const CIRCLE_RADIUS = GRID_SIZE / 4; 
 const TOTAL_TRIALS = 10;
 const FOG_COLOR = 'rgba(0, 0, 0, 1)';
-const visibilityRadius = 63; // visibility radius; 20 is full circle, 70 is next circle 
 
 const getNeighbors = (pos) => [
   [pos[0] - 1, pos[1]], // up
@@ -89,17 +86,6 @@ const generateMaze = (nodeDetails, connectivity_sparsity = 0.2, maze_seed = "Maz
 
   }
 };
-
-const getRandomPositions = (numPositions, rows, cols) => {
-  const positions = [];
-  for (let i = 0; i < numPositions; i++) {
-    const x = Math.floor(Math.random() * cols);
-    const y = Math.floor(Math.random() * rows);
-    positions.push({ x, y });
-  }
-  return positions;
-};
-
 
 const removeEdgesOnly = (maze, adjMatrix, start, goals, removalProb, seed = null, ROWS=7, COLS=7) => {
   const rng = seed ? seedrandom(seed) : Math.random;
@@ -424,8 +410,6 @@ const updateMazeWithNodeNames = (maze, nodeDetails, operations=false) => {
   return updatedMaze;
 };
 
-
-
 const placeOperationNodes = (maze, numNodes, nodeType, predefinedPositions = null, seed = null) => {
   const rng = seed ? seedrandom(seed) : Math.random;
   const positions = [];
@@ -469,7 +453,6 @@ const placeOperationNodes = (maze, numNodes, nodeType, predefinedPositions = nul
 
   return positions;
 };
-
 
 const ensureConnectivity = (maze, adjMatrix, criticalNodes) => {
   for (let i = 0; i < criticalNodes.length - 1; i++) {
@@ -692,7 +675,6 @@ const getAllConnectedNodes = (node, adjMatrix, ROWS, COLS) => {
   return connectedNodes;
 };  
 
-
 const picture = {
   elements: [
     {
@@ -742,11 +724,9 @@ const drawMaze = (maze, adjMatrix, picture, goalPicture, nodeDetails, colorMap,
                   ROWS=7, COLS=7, 
                   pictureVisibility,
                   goalPictureVisibility,
-
-) => {
-  
-                    const elements = [];
-  const goalPictureOffsetX = WIDTH / 2 + 150;
+                ) => {
+                  const elements = [];
+                  const goalPictureOffsetX = WIDTH / 2 + 150;
 
   // Function to draw nodes
   const drawNodes = (colorOverride = null, nodeSize = nodeSize, condition = () => true, drawOrder = 0) => {
@@ -884,7 +864,6 @@ const drawMaze = (maze, adjMatrix, picture, goalPicture, nodeDetails, colorMap,
 
   drawBorder(); // Draw the border after nodes and edges
 
-
   // Function to draw an element based on the given properties
   const drawElement = (element, keyPrefix) => {
     if (element.shape === 'circle') {
@@ -951,7 +930,6 @@ const drawFog = (
   CIRCLE_RADIUS = GRID_SIZE / 4,
   ROWS = 7,
   COLS = 7
-
 
 ) => {
   const visibilityRadiusNodes = GRID_SIZE * visibilityRadiusNode;
@@ -1079,10 +1057,7 @@ const drawFog = (
   );
 };
 
-
-
-// Operations
-
+// Operations ------------------------------------------------------------
 // Rotate the specified rectangle element within the picture by 45 degrees
 const rotateRect45 = (picture, elementIndex) => {
   const element = picture.elements[elementIndex];
@@ -1248,11 +1223,6 @@ const generateNodeDetails = () => {
         quantity: 2,
         mazeName: 2,
         operations: [
-/*           {
-            type: 'rotate180',
-            params: null,
-            targetElementIndex: [1]
-          }, */
           {
             type: 'addRotate45',
             params: null,
@@ -1275,7 +1245,7 @@ const generateNodeDetails = () => {
           },
           {
             type: 'addEdge',
-            params: ([[1,2], [1,4]]),
+            params: ([[1,2], [1,3]]),
             targetElementIndex: [2]
           },
         ],
@@ -1285,7 +1255,6 @@ const generateNodeDetails = () => {
     }
   };
 };
-
 
 const mapMazeNameToColor = (nodeDetails) => {
   const colorMap = {
@@ -1327,7 +1296,6 @@ const mapMazeNameToColor = (nodeDetails) => {
   return colorMap;
 };
 
-
 const ProgressBar = ({ progress}) => {
   const barStyle = {
     width: `${WIDTH}px`,
@@ -1346,7 +1314,6 @@ const ProgressBar = ({ progress}) => {
     </div>
   );
 }; 
-
 
 const RewardBar = ({ reward, mazeWidth, mazeHeight }) => {
   const containerStyle = {
@@ -1456,7 +1423,6 @@ const findNextNodesToActivate = (mazeData, currentPicture, goalPicture, nodeDeta
     nodeKey: node.node,
     operations: node.operations.filter(op => op.type !== 'addEdge') // filter out 'addEdge' operations
   }));
-
 
   const allSubsets = generateSubsets(operationNodes);
   const allPossibleGoalOrders = allSubsets.flatMap(subset => permute(subset));
@@ -2381,8 +2347,6 @@ const updateMazeDataFromNodeDetails = (mazeData, nodeDetails, ROWS, COLS) => {
   return { maze: newMazeWithNodes, adjMatrix: newAdjMatrix, nodeDetails };
 };
 
-
-
 const SettingsManager = ({ settings, updateSettings, setTrialSettings, trial }) => {
   const [trialRange, setTrialRange] = useState([1, 2]);
   const [configurations, setConfigurations] = useState([]);
@@ -2558,9 +2522,6 @@ const settingsManagerStyles = {
     marginLeft: '10px',
   },
 };
-
-
-
 
 const InteractiveMaze = ({ mazeData, onUpdateMazeData, nodeDetails, onManualChange, updateSettings, settings }) => {
   const [nodes, setNodes] = useState([]);
@@ -2851,8 +2812,6 @@ const InteractiveMaze = ({ mazeData, onUpdateMazeData, nodeDetails, onManualChan
   );
 };
 
-
-
 const defaultMaze = [
   [1, 1, 1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1],
@@ -2878,8 +2837,6 @@ const initializeMazeData = () => {
   const adjMatrix = defaultAdjMatrix;
   return { maze, nodeDetails, adjMatrix };
 };
-
-
 
 const MazeGame = () => {
   const [trial, setTrial] = useState(1);
@@ -2976,7 +2933,6 @@ const MazeGame = () => {
     }));
   }, [currentTime, settings.pictureVisibility, settings.goalPictureVisibility]);
 
-
   const handleManualChange = (change) => {
     setSettings((prevSettings) => {
       const updatedManualChanges = [...(prevSettings.manual_changes || []), change];
@@ -3023,13 +2979,11 @@ const MazeGame = () => {
   
   }, [settings.nodeDetails, settings.ROWS, settings.COLS]);
   
-
   // Ensure movement is allowed at start of trial
   useEffect(() => {
     setMovingAllowed(true);
   }, [trial]);
 
-  
   const updateSettings = (newSettings) => {
     setSettings((prevSettings) => {
       const updatedSettings = { ...prevSettings, ...newSettings };
@@ -3173,7 +3127,6 @@ const MazeGame = () => {
     return mazeData;
   };
   
-  
   const applyManualChanges = (mazeData, manualChanges = [], settings) => {
     const { maze, adjMatrix } = mazeData;
   
@@ -3241,8 +3194,6 @@ const MazeGame = () => {
   
     return { maze, adjMatrix };
   };
-  
-
   
   useEffect(() => {
     const generateAndSetMaze = (details) => {
@@ -3316,8 +3267,6 @@ const MazeGame = () => {
     settings.manual_changes // Add this dependency
   ]);
   
-  
-
   // Helper function for shuffling array
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -3616,8 +3565,6 @@ const MazeGame = () => {
     }
   };
 
- 
-
   const handleMouseEnter = () => {
     setIsHover(true);
   };
@@ -3740,9 +3687,7 @@ const MazeGame = () => {
             </button>
           </div>
           {settings.progressBar && (
-            
             <div style={{ position: 'absolute', bottom: 0, width: `${settings.WIDTH}px` }}>
-              
               <ProgressBar progress={progress} />
             </div>
           )}
