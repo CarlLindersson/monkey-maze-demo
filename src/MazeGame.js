@@ -4834,7 +4834,7 @@ const MazeGame = () => {
         <div style={{ position: 'absolute', bottom: 0, width: '100%' }}>
           {settings.rewardBar && (
             <div style={{ position: 'absolute', bottom: 0, width: `${settings.WIDTH}px` }}>
-              <RewardBar reward={reward} mazeWidth={settings.WIDTH} mazeHeight={settings.HEIGHT} />
+              <RewardBar reward={reward} mazeWidth={settings.WIDTH} mazeHeight={settings.HEIGHT+18} />
             </div>
           )}
         </div>
@@ -4849,7 +4849,7 @@ const MazeGame = () => {
                       updatePicture  = {setCurrentPicture} 
                       />
       </div>
-      <div>
+      <div style={{marginLeft:'5px'}}>
         <SettingsManager
           settings={settings}
           updateSettings={updateSettings}
