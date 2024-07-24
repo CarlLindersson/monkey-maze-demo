@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/monkey-maze-demo/static/css/main.1e264c8f.css",
+    "main.js": "/monkey-maze-demo/static/js/main.c0b25df9.js",
+    "index.html": "/monkey-maze-demo/index.html",
+    "main.1e264c8f.css.map": "/monkey-maze-demo/static/css/main.1e264c8f.css.map",
+    "main.c0b25df9.js.map": "/monkey-maze-demo/static/js/main.c0b25df9.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1e264c8f.css",
+    "static/js/main.c0b25df9.js"
+  ]
+}
