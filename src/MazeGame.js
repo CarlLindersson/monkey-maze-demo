@@ -2347,10 +2347,25 @@ const updateMazeDataFromNodeDetails = (mazeData, nodeDetails, ROWS, COLS) => {
   return { maze: newMazeWithNodes, adjMatrix: newAdjMatrix, nodeDetails };
 };
 
-const SettingsManager = ({ settings, updateSettings, setTrialSettings, trial }) => {
+
+const SettingsManager = ({ settings, updateSettings, setTrialSettings, trial, setTrial }) => {
   const [trialRange, setTrialRange] = useState([1, 2]);
   const [configurations, setConfigurations] = useState([]);
   const [configName, setConfigName] = useState('');
+  const [saveName, setSaveName] = useState('');
+
+  const getMaxTrialFromConfigs = (configs) => {
+    if (configs.length === 0) {
+      return 10; // Default value if no configs are present
+    }
+    let maxTrial = 10; // Default value
+    configs.forEach(config => {
+      if (config.trialRange && config.trialRange.length === 2) {
+        maxTrial = Math.max(maxTrial, config.trialRange[1]);
+      }
+    });
+    return maxTrial;
+  };
 
   const saveConfiguration = () => {
     const newConfig = {
@@ -2362,33 +2377,62 @@ const SettingsManager = ({ settings, updateSettings, setTrialSettings, trial }) 
     setConfigurations((prevConfigs) => [...prevConfigs, newConfig]);
     setConfigName('');
   };
-  
+
   const applyConfiguration = (config) => {
     const newSettings = {
       ...config.settings,
       nodeDetails: JSON.parse(JSON.stringify(config.nodeDetails)), // Deep copy nodeDetails
       manual_changes: JSON.parse(JSON.stringify(config.settings.manual_changes || [])) // Ensure deep copy of manual changes
     };
+    newSettings.TOTAL_TRIALS = getMaxTrialFromConfigs(configurations);
     updateSettings(newSettings);
     setTrialSettings(config.trialRange);
+    setTrial(config.trialRange[0]);
     console.log('apply config pressed', newSettings);
   };
 
   const deleteConfiguration = (index) => {
     setConfigurations((prevConfigs) => prevConfigs.filter((_, i) => i !== index));
   };
-  
+
   useEffect(() => {
     const currentConfig = configurations.find(
       (config) => trial >= config.trialRange[0] && trial <= config.trialRange[1]
     );
+
     if (currentConfig) {
       applyConfiguration(currentConfig);
     } else if (configurations.length > 0) {
       alert('No more configurations. Session finished.');
     }
   }, [trial, configurations]);
-  
+
+  const handleDownload = () => {
+    const saveName = prompt("Enter the name for the configuration file:");
+    if (saveName) {
+      downloadConfigurations(saveName);
+    }
+  };
+
+  const downloadConfigurations = (saveName) => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(configurations));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `${saveName}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const uploadConfigurations = (event) => {
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      const uploadedConfigs = JSON.parse(e.target.result);
+      setConfigurations(uploadedConfigs);
+    };
+    fileReader.readAsText(event.target.files[0]);
+  };
+
   return (
     <div style={settingsManagerStyles.container}>
       <h3 style={settingsManagerStyles.header}>Trial Manager</h3>
@@ -2436,9 +2480,15 @@ const SettingsManager = ({ settings, updateSettings, setTrialSettings, trial }) 
           </div>
         ))}
       </div>
+      <div style={settingsManagerStyles.configList}>
+        <button onClick={handleDownload} style={settingsManagerStyles.downloadButton}>Download Configurations</button>
+        <input type="file" accept=".json" onChange={uploadConfigurations} style={{ display: 'none' }} id="upload-config" />
+        <label htmlFor="upload-config" style={settingsManagerStyles.uploadButton}>Upload Configurations</label>
+      </div>
     </div>
   );
 };
+
 
 const settingsManagerStyles = {
   container: {
@@ -2486,6 +2536,31 @@ const settingsManagerStyles = {
   },
   saveButtonHover: {
     backgroundColor: '#45a049',
+  },
+  downloadButton: {
+    display: 'block',
+    width: '100%',
+    padding: '10px',
+    backgroundColor: '#8c8c8c', // Different color from save button
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginBottom: '10px',
+  },
+  uploadButton: {
+    display: 'block',
+    /* width: '100%', */
+    padding: '10px',
+    backgroundColor: '#8c8c8c', // Different color from save button
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    marginBottom: '10px',
+    fontSize: 14
+    
   },
   configList: {
     marginTop: '20px',
@@ -3292,7 +3367,7 @@ const MazeGame = () => {
 
     // Generate an array of all operation nodes based on their quantity
     const operationNodes = availableOperations.flatMap((nodeKey) => {
-      const node = nodeDetails.operation[nodeKey];
+      const node = settings.nodeDetails.operation[nodeKey];
       return Array(node.quantity)
         .fill()
         .map(() => ({
@@ -3562,6 +3637,9 @@ const MazeGame = () => {
       
     } else {
       alert('You have completed all trials!');
+      setPlayerPos(settings.nodeDetails.start.positions[0]);
+      setCurrentPicture(picture);
+      setShowTrialScreen(false);
     }
   };
 
@@ -3716,6 +3794,7 @@ const MazeGame = () => {
           updateSettings={updateSettings}
           setTrialSettings={setTrialSettings}
           trial={trial}
+          setTrial={setTrial}
       />
       </div>
     </div>
