@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/monkey-maze-demo/static/css/main.789086f0.css",
-    "main.js": "/monkey-maze-demo/static/js/main.7937996b.js",
+    "main.js": "/monkey-maze-demo/static/js/main.0f5683a4.js",
     "index.html": "/monkey-maze-demo/index.html",
     "main.789086f0.css.map": "/monkey-maze-demo/static/css/main.789086f0.css.map",
-    "main.7937996b.js.map": "/monkey-maze-demo/static/js/main.7937996b.js.map"
+    "main.0f5683a4.js.map": "/monkey-maze-demo/static/js/main.0f5683a4.js.map"
   },
   "entrypoints": [
     "static/css/main.789086f0.css",
-    "static/js/main.7937996b.js"
+    "static/js/main.0f5683a4.js"
   ]
 }
